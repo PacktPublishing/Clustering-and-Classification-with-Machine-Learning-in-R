@@ -1,0 +1,25 @@
+########################################################################
+###################################################################
+
+head(iris)
+df=iris[,-c(5)] ##consider the numerical predictors only
+
+head(df)
+
+library(factoextra)
+
+fviz_dist(dist(df),show_labels = FALSE)
+#visualize clustering tendency
+
+## clustering tendency in the data
+##Before applying cluster methods, 
+##the first step is to assess whether the data is clusterable
+## Hopkins' statistic was computed
+## higher Hopkins' statistic means more clusterable
+
+res=get_clust_tendency(df,n=nrow(df)-1,graph = FALSE)
+
+## Hopkins' statistic
+## cut-off 0.5
+
+res$hopkins_stat

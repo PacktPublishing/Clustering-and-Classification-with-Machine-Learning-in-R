@@ -1,0 +1,48 @@
+library(caret)
+
+library("mlbench")
+data(Sonar)
+
+head(Sonar)
+str(Sonar)
+
+## 60/40 split
+tr <- sample(nrow(Sonar), round(nrow(Sonar) * 0.6))
+train <- Sonar[tr, ] #60% data
+test <- Sonar[-tr, ]
+
+
+model <- glm(Class ~ ., data = train, family = "binomial")
+p <- predict(model, test, type = "response")
+summary(p)
+
+cl <- ifelse(p > 0.5, "M", "R")
+table(cl, test$Class)
+
+
+confusionMatrix(cl, test$Class)
+
+##Accuracy of binary classification
+
+##ROC curve is a fundamental tool for diagnostic test evaluation. 
+##In a ROC curve the true positive rate (Sensitivity) is plotted in 
+##function of the false positive rate (100-Specificity) 
+library(caTools)
+caTools::colAUC(p, test[["Class"]], plotROC = TRUE)
+
+##auc
+##summary measure of the accuracy-- as in upto what extent the classifier
+## is not making random predictions
+##auc=0.5 chance prediction 
+
+library(pROC)
+
+##receiver operator curve
+roc = pROC::roc(test[,"Class"], p) #compare testing data
+#with predicted responses
+
+auc= pROC::auc(roc)
+auc
+
+plot(roc)
+text(0.5,0.5,paste("AUC = ",format(auc, digits=5, scientific=FALSE)))

@@ -1,0 +1,34 @@
+##Unlike K-means, 
+##DBSCAN does not require the user to specify the number of clusters to be generated
+
+#install.packages("dbscan")
+
+library("dbscan")
+
+data("iris")
+head(iris)
+
+x <- as.matrix(iris[, 1:4])#numerical predictors
+
+head(x)
+
+##select the epsilon or eps value
+
+db <- dbscan(x, eps = .4, minPts = 4)
+db
+
+pairs(x, col = db$cluster + 1L)
+
+##determining the optimal eps value
+## computing the k-nearest neighbor distances in a matrix of points.
+dbscan::kNNdistplot(x, k =  5)
+abline(h = 0.15, lty = 2)
+
+##visualize clusters
+res.fpc <- fpc::dbscan(x, eps = 0.4, MinPts = 4)
+# dbscan package
+res.db <- dbscan::dbscan(x, 0.4, 4)
+
+require(fpc)
+require(factoextra)
+fviz_cluster(res.fpc, x, geom = "point")

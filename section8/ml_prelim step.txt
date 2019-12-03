@@ -1,0 +1,31 @@
+pa=read.csv("Pres_abs.csv")
+
+#pa=na.omit(pa)
+
+tail(pa)
+
+summary(pa)
+
+pb=as.factor(pa$pb) #1 stands for presence and 0 for absence
+land=as.factor(pa$land) #land use categories are categorical
+
+head(pa)
+library(caret)
+
+set.seed(1) #pseudo-repeatability
+trainIndex = createDataPartition(pa$pb, p = .75, 
+                                 list = FALSE, 
+                                 times = 1) #y as basis of splitting
+
+training = pa[ trainIndex,] #75% data for model training
+testing= pa[-trainIndex,] #25% for model testing
+
+head(training)
+
+
+set.seed(825)
+
+
+## caret
+# define training control--> 10fold cv
+train_control = trainControl(method="cv", number=10)

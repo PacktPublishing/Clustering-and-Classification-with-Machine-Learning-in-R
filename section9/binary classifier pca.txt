@@ -1,0 +1,95 @@
+###################################################################
+##############  Use PCA within a binary classifier
+## uncorrelated pcs 
+
+require(caret)
+setwd("F:\\DataMining_R\\3_LectureData\\section9")
+
+tumor=read.csv("cancer_tumor.csv") #predict if the tumor is
+#malignant (M) or benign (B)
+
+head(tumor)
+
+#drop columns
+drops =c("id","X")
+df=tumor[ , !(names(tumor) %in% drops)]
+
+head(df)
+
+table(df$diagnosis)
+
+prop.table(table(df$diagnosis))
+
+####### is there multi-collinearity in my predictors
+
+corr_mat = cor(df[,2:ncol(df)]) #predictors start from column 2 on
+
+library(corrplot)
+corrplot(corr_mat)
+
+#### many of the predictors are highy correlated
+### principal components are uncorrelated
+
+pcav = prcomp(df[,2:ncol(df)], center = TRUE, scale = TRUE)
+#we do the centering and scaling as well
+plot(pcav, type="l")
+
+summary(pcav)
+
+pca_df = as.data.frame(pcav$x)
+
+library(ggplot2)
+ggplot(pca_df, aes(x=PC1, y=PC2, col=df$diagnosis)) + geom_point(alpha=0.5)
+
+############### Data Preperation
+
+set.seed(99)
+Train = createDataPartition(df$diagnosis, p=0.75, list=FALSE)
+#split data in 75%-25% ratio
+
+training = df[ Train, ] #75% data for training 
+testing = df[ -Train, ] #25% testing
+
+## implement cross-validation
+fitControl = trainControl(method="cv",
+                           number = 10,
+                           preProcOptions = list(thresh = 0.95), # threshold for pca preprocess
+                           classProbs = TRUE,
+                           summaryFunction = twoClassSummary)
+
+##### Use LDA as a classifier
+
+fit_l <- train(diagnosis~.,
+                        training,
+                        method="lda",
+                        metric="ROC",
+                        preProcess=c('center', 'scale', 'pca'),
+                        tuneLength=10,
+                        trace=FALSE,
+                        trControl=fitControl)
+
+## predict tumor diagnosis on unseen data
+pred_l= predict(fit_l, testing)
+
+cm_lda=confusionMatrix(pred_l, testing$diagnosis, positive = "M")
+cm_lda
+
+
+####### naive bayes: use for both multi-class & binary classification
+## based on applying Bayes’ theorem with the “naive” assumption of 
+## independence between every pair of features.
+
+fit_n <- train(diagnosis~.,
+               training,
+               method="nb",
+               metric="ROC",
+               preProcess=c('center', 'scale', 'pca'),
+               tuneLength=10,
+               trace=FALSE,
+               trControl=fitControl)
+
+## predict tumor diagnosis on unseen data
+pred_n= predict(fit_n, testing)
+
+cm_nb=confusionMatrix(pred_n, testing$diagnosis, positive = "M")
+cm_nb

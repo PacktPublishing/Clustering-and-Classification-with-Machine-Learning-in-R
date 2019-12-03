@@ -1,0 +1,52 @@
+####################################################################
+############## SVM
+
+library(caret)
+library(ggplot2)
+
+head(diamonds)
+
+dm=as.data.frame(diamonds)
+
+head(dm)
+
+
+############# predict the cut (categorical variable)
+set.seed(99)
+Train = createDataPartition(dm$cut , p=0.75, list=FALSE)
+#split data in 75%-25% ratio
+
+training = dm[ Train, ] #75% data for training 
+testing = dm[ -Train, ] #25% testing
+
+library(kernlab)
+
+cut_classifier = ksvm(cut ~ ., data = training,
+                          kernel = "vanilladot") #linear kernel
+# look at basic information about the model
+cut_classifier
+
+# predictions on testing dataset
+cut_predictions = predict(cut_classifier, testing)
+
+head(cut_predictions)
+
+table(cut_predictions, testing$cut)
+
+cm=confusionMatrix(cut_predictions, testing$cut)
+cm
+
+##RBF kernel
+cut_classifier2 = ksvm(cut ~ ., data = training,
+                      kernel = "rbfdot")
+
+cut_classifier2
+
+cut_predictions2 = predict(cut_classifier2, testing)
+
+head(cut_predictions2)
+
+table(cut_predictions2, testing$cut)
+
+cm=confusionMatrix(cut_predictions2, testing$cut)
+cm

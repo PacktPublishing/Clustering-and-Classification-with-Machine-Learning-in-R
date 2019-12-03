@@ -1,0 +1,24 @@
+######## More on PCA 
+
+setwd("F:\\cluster_class-R\\Data\\section6")
+
+
+head(swiss)
+swiss = swiss[,-1]
+
+swiss.pca = prcomp(swiss,center = TRUE,scale = TRUE)
+summary(swiss.pca)
+swiss.pca
+##make a prediction
+predict(swiss.pca, newdata=head(swiss, 1))
+screeplot(swiss.pca, type="barplot")
+screeplot(swiss.pca, type="line")
+
+##use the Kaiser method to determine the number of
+##principal components. 
+##Select components with a variance above 1:
+which(swiss.pca$sdev ^ 2> 1)
+
+## use scree plots to identify components with variance>1
+screeplot(swiss.pca, type="line")
+abline(h=1, col="red", lty= 3)

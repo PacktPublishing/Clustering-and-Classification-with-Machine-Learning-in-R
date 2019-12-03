@@ -1,0 +1,33 @@
+
+library(factoextra)
+library(fpc)
+library(NbClust)
+
+head(iris)
+df=iris[,-5]
+
+df=scale(df)
+
+km.res=eclust(df, "kmeans", k=3, nstart=25, graph=FALSE)
+##3 clusters
+
+fviz_cluster(km.res, geom="point", ellipse.type = "norm",
+             palette="jco")
+
+##Cluster validation: Silhouette Plot
+## values closer to 1--> well clustered 
+ fviz_silhouette(km.res,palette="jco")
+ 
+## clustering accuracy
+ 
+table(iris$Species,km.res$cluster)
+
+species=as.numeric(iris$Species)
+
+#require(fpc)
+cluster_stats=cluster.stats(d=dist(df),species,km.res$cluster)
+
+cluster_stats
+
+#corrected rand: similarity bw 2 partitions
+## values close to 1--> perfect agreement

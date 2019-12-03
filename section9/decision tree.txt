@@ -1,0 +1,59 @@
+###########################################################
+############ Decision tree
+
+library(caret)
+library(rattle)
+library(rpart.plot)
+library(rpart)
+
+setwd("F:\\DataMining_R\\3_LectureData")
+library(caret)
+
+lp=read.csv("LoanPay.csv")
+head(lp)
+summary(lp)
+
+lp[is.na(lp)] = 0 #replace NA with 0
+
+nameList=c("loan_status","Principal","terms","age","education","Gender","past_due_days")
+
+df= lp[,colnames(lp) %in% nameList] 
+
+head(df)
+
+### 1) Data split
+
+set.seed(99)
+Train = createDataPartition(df$loan_status, p=0.75, list=FALSE)
+#split data in 75%-25% ratio
+
+training = df[ Train, ] #75% data for training 
+testing = df[ -Train, ] #25% testing
+
+# define training control
+train_control <- trainControl(method="cv", number=10)
+#10 fold cv
+
+
+fit1= train(loan_status~., data=training, method="rpart",
+            trControl=train_control)
+
+fit1
+
+fancyRpartPlot(fit1$finalModel)
+
+summary(fit1)
+
+#### which are the important variables
+
+varImp(fit1)
+
+summary(df)
+
+plot(varImp(fit1), top = 5)
+
+########## predict on unseen data
+
+pred1 = predict(fit1, testing)
+
+confusionMatrix(pred1, testing$loan_status)

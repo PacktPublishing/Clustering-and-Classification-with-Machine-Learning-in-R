@@ -1,0 +1,24 @@
+#### Which clustering algorithm to choose?
+
+library(clValid)
+
+head(iris)
+df=iris[,-5]
+
+head(df)
+
+df=scale(df)
+
+##clustering methods to compare
+cmethods=c("kmeans","hierarchical","pam") #vector
+
+comp=clValid(df,nClust=2:6, clMethods = cmethods, validation="internal")
+## number of clusters for testing nClust
+
+summary(comp)
+
+##use "stability" for validation
+
+comp2=clValid(df,nClust=2:6, clMethods = cmethods, validation="stability")
+
+summary(comp2)

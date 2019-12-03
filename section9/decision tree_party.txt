@@ -1,0 +1,36 @@
+
+##recursive partitioning
+library(party)
+
+head(iris)
+
+iris.ct <- ctree(Species ~ ., data = iris, controls = ctree_control(maxsurrogate = 3))
+
+iris.ct
+
+plot(iris.ct)
+nodes(iris.ct, 1)
+
+table(iris$Species, predict(iris.ct), dnn = c("Actual species", "Predicted species"))
+
+setwd("F:\\cluster_class-R\\Data\\section8")
+
+lp=read.csv("LoanPay.csv")
+head(lp)
+summary(lp)
+
+lp[is.na(lp)] = 0 #replace NA with 0
+
+nameList=c("loan_status","Principal","terms","age","education","Gender","past_due_days")
+
+df= lp[,colnames(lp) %in% nameList] 
+
+head(df)
+
+loan.ct <- ctree(loan_status ~ ., data = df, controls = ctree_control(maxsurrogate = 3))
+
+loan.ct
+
+plot(loan.ct)
+nodes(loan.ct, 1)
+

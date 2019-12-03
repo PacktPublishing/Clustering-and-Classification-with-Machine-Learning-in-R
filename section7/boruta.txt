@@ -1,0 +1,35 @@
+############# BORUTA: Feature selection
+
+#### Boruta is an all relevant feature selection wrapper algorithm, 
+###outputs variable importance measure (VIM) using random forest
+### performs a top-down search for relevant features by comparing original attributes' 
+#importance with importance achievable at random
+### progressively elliminating irrelevant featurs to stabilise that test.
+
+library(Boruta)
+
+require(caret)
+setwd("F:\\DataMining_R\\3_LectureData\\section9")
+
+tumor=read.csv("cancer_tumor.csv") #predict if the tumor is
+#malignant (M) or benign (B)
+
+head(tumor)
+
+str(tumor)
+
+#drop columns
+drops =c("id","X")
+df=tumor[ , !(names(tumor) %in% drops)]
+
+head(df)
+
+table(df$diagnosis)
+
+prop.table(table(df$diagnosis)
+          
+bor.results = Boruta(df,df$diagnosis,
+                      maxRuns=101,
+                      doTrace=0)
+
+bor.results

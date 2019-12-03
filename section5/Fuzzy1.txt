@@ -1,0 +1,85 @@
+###################################################################
+############### Fuzzy K-means clustering 
+
+## allows one point to belong to one or more clusters
+##ach data point has membership coefficient to the different clusters.
+##each point has a probability of belonging to each cluster
+## each observation is “spread out” over the various clusters.
+
+require(e1071)
+head(USArrests)
+
+df = scale(USArrests)
+
+cl<-cmeans(df,6,20,verbose=TRUE,method="cmeans")
+head(cl)
+
+fclustIndex(cl, df, index = "all")
+#pc: partition.coefficient--> higher values are better
+
+require(fclust)
+
+data(unemployment)
+head(unemployment)
+
+
+## fuzzy k-means
+unempFKM=FKM(unemployment,k=3,stand=1) #specify 3 fuzzy clusters
+unempFKM
+
+summary(unempFKM)
+
+plot(unempFKM,v1v2=c(1,3))
+
+plot(unempFKM,v1v2=c(1,3),umin=0.5)
+## coloring in black objects with 
+#maximal membership degree lower than 0.5
+
+g=FKM.gk(unemployment) #non-spherical clusters
+summary(g)
+plot(g)
+
+VIFCR (g, which) #see the clustering result
+
+require(cluster)
+
+head(USArrests)
+
+df = scale(USArrests)     # Standardize the data
+resf= fanny(df, 3)  # Compute fuzzy clustering with k = 3
+
+head(resf$membership, 3) # Membership coefficients
+
+head(resf$clustering) # Observation groups
+
+library(factoextra)
+fviz_cluster(resf, ellipse.type = "norm", repel = TRUE,
+             palette = "jco", ggtheme = theme_minimal(),
+             legend = "right")
+
+#To evaluate the goodnesss of the clustering results, 
+#plot the silhouette coefficient
+#method of interpretation and validation of consistency within the cluster
+#a high value indicates that the object is well matched to its own cluster
+
+fviz_silhouette(resf, palette = "jco",
+                ggtheme = theme_minimal())
+
+
+df2 = scale(unemployment)     # Standardize the data
+resf2= fanny(df2, 3)  # Compute fuzzy clustering with k = 3
+
+head(resf2$membership, 7) # Membership coefficients
+
+head(resf2$clustering) # Observation groups
+
+#visualize
+fviz_cluster(resf2, ellipse.type = "norm", repel = TRUE,
+             palette = "jco", ggtheme = theme_minimal(),
+             legend = "right")
+
+fviz_silhouette(resf2, palette = "jco",
+                ggtheme = theme_minimal())
+
+## decide on cluster numbers?
+plot(fanny(USArrests, 6))
