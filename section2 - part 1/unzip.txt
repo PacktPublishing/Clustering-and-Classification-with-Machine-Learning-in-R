@@ -1,0 +1,19 @@
+##################################################################
+########## Download zipped folder with csv
+
+setwd("F:\\TextMining_R\\unzip")
+
+# Create a temp. file name
+temp = tempfile()
+
+# Use download.file() to fetch the file into the temp. file
+download.file("http://www.bls.gov/cex/pumd/data/comma/diary14.zip",temp)
+
+# Use unz() to extract the target file from temp. file
+### expd142.csv
+zip_data2 =read.csv(unz(temp, "diary14/expd142.csv"))
+
+# Remove the temp file via unlink()
+unlink(temp)
+
+zip_data2[1:5, 1:10]
